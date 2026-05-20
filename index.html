@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salt Translator</title>
+    <style>
+        body { background-color: #f0f2f5; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .box { max-width: 500px; width: 100%; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #1a73e8; }
+        .input-unit { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 10px; }
+        input, textarea { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; background: #1a73e8; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #1557b0; }
+        #result { margin-top: 30px; display: none; padding: 20px; border-radius: 15px; background: #f8f9fa; }
+        .badge { display: inline-block; padding: 8px 15px; border-radius: 50px; color: white; font-weight: bold; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🧂 Salt Translator</h1>
+        <div class="input-unit">
+            <label>음식 이름</label>
+            <input type="text" id="fname" placeholder="예: 김치찌개">
+        </div>
+        <div class="input-unit">
+            <label>재료 (쉼표로 구분)</label>
+            <textarea id="ings" placeholder="김치, 간장, 두부, 소금"></textarea>
+        </div>
+        <button onclick="start()">분석 결과 보기</button>
+
+        <div id="result">
+            <div id="grade" class="badge"></div>
+            <p style="font-size: 1.2rem;"><strong>번역:</strong> <span id="t_food"></span></p>
+            <p><strong>총 나트륨:</strong> <span id="t_salt" style="font-weight:bold; color:red;"></span> mg</p>
+            <hr>
+            <ul id="t_list" style="padding-left: 20px; line-height: 1.8;"></ul>
+        </div>
+    </div>
+
+    <script>
+        const sData = { "김치": 500, "간장": 879, "소금": 1000, "된장": 620, "두부": 15, "양파": 4, "마늘": 2, "라면스프": 1200 };
+        const tData = { "김치찌개": "Kimchi stew", "된장찌개": "Soybean paste stew", "라면": "Ramen", "김치": "Kimchi", "간장": "Soy sauce", "두부": "Tofu", "양파": "Onion", "마늘": "Garlic", "소금": "Salt" };
+
+        function start() {
+            const f = document.getElementById('fname').value.trim();
+            const i = document.getElementById('ings').value.trim();
+            if(!f || !i) return alert("빈칸을 채워주세요!");
+
+            document.getElementById('t_food').innerText = `${f} → ${tData[f] || "Unknown"}`;
+            const items = i.split(',').map(x => x.trim());
+            let total = 0; let list = "";
+
+            items.forEach(item => {
+                const s = sData[item] || 0;
+                total += s;
+                list += `<li>${item} (${tData[item] || 'Unknown'}): ${s}mg</li>`;
+            });
+
+            document.getElementById('t_salt').innerText = total;
+            document.getElementById('t_list').innerHTML = list;
+            const g = document.getElementById('grade');
+            if(total <= 500) { g.innerText = "저염 😊"; g.style.background = "#2ecc71"; }
+            else if(total <= 1500) { g.innerText = "보통 ⚠️"; g.style.background = "#f1c40f"; }
+            else { g.innerText = "고염 🚨"; g.style.background = "#e74c3c"; }
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
